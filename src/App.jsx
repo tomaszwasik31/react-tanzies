@@ -4,23 +4,33 @@ import Die from "./components/Die";
 import nextId from "react-id-generator";
 
 /**
- * Challenge: Update the array of numbers in state to be
- * an array of objects instead. Each object should look like:
- * { value: <random number>, isHeld: false }
+ * Challenge: Update the `rollDice` function to not just roll
+ * all new dice, but instead to look through the existing dice
+ * to NOT role any that are being `held`.
  *
- * Making this change will break parts of our code, so make
- * sure to update things so we're back to a working state
+ * Hint: this will look relatively similiar to the `holdDice`
+ * function below. When creating new dice, remember to use
+ * `id: nanoid()` so any new dice have an `id` as well.
  */
 
 function App() {
   const [numbersArray, setNumbersArray] = React.useState(allNewDice());
 
   const allDices = numbersArray.map((die) => (
-    <Die value={die.value} key={die.key} isHeld={die.isHeld} />
+    <Die
+      value={die.value}
+      key={die.id}
+      isHeld={die.isHeld}
+      handleClick={() => holdDice(die.id)}
+    />
   ));
 
-  function reroll() {
-    setNumbersArray(allNewDice());
+  function rollDice() {
+    setNumbersArray((prevArray) =>
+      prevArray.map((die) => {
+        return die.isHeld ? die : { ...die, value: randomNumber() };
+      })
+    );
   }
   function randomNumber() {
     return Math.floor(Math.random() * 6) + 1;
@@ -32,18 +42,29 @@ function App() {
       numbersArray.push({
         value: randomNumber(),
         isHeld: false,
-        key: nextId(),
+        id: nextId(),
       });
     }
     return numbersArray;
+  }
+  function holdDice(id) {
+    setNumbersArray((oldArray) =>
+      oldArray.map((die) => {
+        return die.id === id ? { ...die, isHeld: !die.isHeld } : die;
+      })
+    );
   }
 
   return (
     <main>
       <div className="wrapper">
+        <h1 className="title">Tenzies</h1>
+        <p className="instructions">
+          Roll until all dice are the same. Click each die to freeze it at its
+          current value between rolls.
+        </p>
         <div className="die-wrapper">{allDices}</div>
-        <button className="roll-btn" onClick={reroll}>
-          {" "}
+        <button className="roll-btn" onClick={rollDice}>
           Roll dice
         </button>
       </div>
