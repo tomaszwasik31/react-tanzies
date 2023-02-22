@@ -2,13 +2,14 @@ import React from "react";
 import "./App.css";
 import Die from "./components/Die";
 import nextId from "react-id-generator";
+import Confetti from "react-confetti";
 
 /**
  * Challenge: Tie off loose ends!
  * 1. If tenzies is true, Change the button text to "New Game"
  * 2. If tenzies is true, use the "react-confetti" package to
  *    render the <Confetti /> component 🎉
- * 
+ *
  *    Hint: don't worry about the `height` and `width` props
  *    it mentions in the documentation.
  */
@@ -67,9 +68,14 @@ function App() {
       })
     );
   }
+  function newGame() {
+    setTenzies(false);
+    setNumbersArray(allNewDice());
+  }
 
   return (
     <main>
+      {tenzies && <Confetti />}
       <div className="wrapper">
         <h1 className="title">Tenzies</h1>
         <p className="instructions">
@@ -77,8 +83,8 @@ function App() {
           current value between rolls.
         </p>
         <div className="die-wrapper">{allDices}</div>
-        <button className="roll-btn" onClick={rollDice}>
-          Roll dice
+        <button className="roll-btn" onClick={tenzies ? newGame : rollDice}>
+          {tenzies ? "New game" : "Roll dice"}
         </button>
       </div>
     </main>
