@@ -4,17 +4,41 @@ import Die from "./components/Die";
 import nextId from "react-id-generator";
 
 /**
- * Challenge: Update the `rollDice` function to not just roll
- * all new dice, but instead to look through the existing dice
- * to NOT role any that are being `held`.
- *
- * Hint: this will look relatively similiar to the `holdDice`
- * function below. When creating new dice, remember to use
- * `id: nanoid()` so any new dice have an `id` as well.
+ * Challenge: Tie off loose ends!
+ * 1. If tenzies is true, Change the button text to "New Game"
+ * 2. If tenzies is true, use the "react-confetti" package to
+ *    render the <Confetti /> component 🎉
+ * 
+ *    Hint: don't worry about the `height` and `width` props
+ *    it mentions in the documentation.
  */
 
 function App() {
+  const [tenzies, setTenzies] = React.useState(false);
+
   const [numbersArray, setNumbersArray] = React.useState(allNewDice());
+  React.useEffect(() => {
+    if (
+      numbersArray.every(
+        (dice) => dice.isHeld && numbersArray[0].value === dice.value
+      )
+    ) {
+      console.log("game won");
+      setTenzies(true);
+    }
+  }, [numbersArray]);
+
+  function allNewDice() {
+    let numbersArray = [];
+    for (let i = 0; i < 10; i++) {
+      numbersArray.push({
+        value: randomNumber(),
+        isHeld: false,
+        id: nextId(),
+      });
+    }
+    return numbersArray;
+  }
 
   const allDices = numbersArray.map((die) => (
     <Die
@@ -36,17 +60,6 @@ function App() {
     return Math.floor(Math.random() * 6) + 1;
   }
 
-  function allNewDice() {
-    let numbersArray = [];
-    for (let i = 0; i < 10; i++) {
-      numbersArray.push({
-        value: randomNumber(),
-        isHeld: false,
-        id: nextId(),
-      });
-    }
-    return numbersArray;
-  }
   function holdDice(id) {
     setNumbersArray((oldArray) =>
       oldArray.map((die) => {
